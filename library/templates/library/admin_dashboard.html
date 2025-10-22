@@ -9,30 +9,40 @@
     <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-6">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-blue-100">Total Students</p>
-                <p class="text-3xl font-bold">{{ total_students }}</p>
-            </div>
-            <i class="fas fa-users text-4xl opacity-50"></i>
-        </div>
-    </div>
-    
-    <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg shadow-lg p-6">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-green-100">Total Books</p>
+                <p class="text-blue-100">Total Books</p>
                 <p class="text-3xl font-bold">{{ total_books }}</p>
             </div>
             <i class="fas fa-book text-4xl opacity-50"></i>
         </div>
     </div>
     
-    <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white rounded-lg shadow-lg p-6">
+    <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg shadow-lg p-6">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-yellow-100">Currently Borrowed</p>
+                <p class="text-green-100">Available Books</p>
+                <p class="text-3xl font-bold">{{ total_available }}</p>
+            </div>
+            <i class="fas fa-book-open text-4xl opacity-50"></i>
+        </div>
+    </div>
+    
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-purple-100">Total Students</p>
+                <p class="text-3xl font-bold">{{ total_students }}</p>
+            </div>
+            <i class="fas fa-users text-4xl opacity-50"></i>
+        </div>
+    </div>
+    
+    <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-orange-100">Currently Borrowed</p>
                 <p class="text-3xl font-bold">{{ total_borrowed }}</p>
             </div>
-            <i class="fas fa-book-reader text-4xl opacity-50"></i>
+            <i class="fas fa-hand-holding-heart text-4xl opacity-50"></i>
         </div>
     </div>
 

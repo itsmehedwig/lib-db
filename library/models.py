@@ -220,6 +220,21 @@ class Librarian(models.Model):
         verbose_name_plural = 'Librarians'
 
 
+class POS(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200)
+    serial_number = models.CharField(max_length=100, unique=True)
+    profile_photo = models.ImageField(upload_to='pos_photos/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.name} ({self.serial_number})"
+    
+    class Meta:
+        verbose_name = 'POS'
+        verbose_name_plural = 'POS'
+
+
 class SystemSettings(models.Model):
     system_name = models.CharField(max_length=200, default='Library Management System')
     system_logo = models.ImageField(upload_to='system/', blank=True, null=True)
@@ -254,6 +269,8 @@ class AdminLog(models.Model):
         ('transaction_approve', 'Approved Transaction'),
         ('transaction_reject', 'Rejected Transaction'),
         ('pos_create', 'Created POS Account'),
+        ('pos_edit', 'Edited POS Account'),
+        ('pos_delete', 'Deleted POS Account'),
     )
     
     librarian = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'user_type': 'librarian'})

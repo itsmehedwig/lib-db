@@ -11,9 +11,9 @@ from datetime import timedelta
 import csv
 from io import TextIOWrapper
 
-from .models import User, Student, Book, Transaction, VerificationCode, TransactionItem, Librarian, SystemSettings, AdminLog
+from .models import User, Student, Book, Transaction, VerificationCode, TransactionItem, Librarian, POS, SystemSettings, AdminLog
 from .forms import (LoginForm, StudentIDVerificationForm, StudentRegistrationForm,
-                   EmailVerificationForm, CSVUploadForm, BookForm, POSUserForm,
+                   EmailVerificationForm, CSVUploadForm, BookForm, POSForm,
                    StudentSearchForm, ISBNSearchForm, TransactionCodeForm, StudentForm,
                    LibrarianForm, SystemSettingsForm)
 
@@ -634,27 +634,109 @@ def reject_student(request, student_id):
 
 
 @login_required
-def create_pos_account(request):
+def manage_pos(request):
+    if request.user.user_type != 'admin':
+        return redirect('dashboard')
+    
+    pos_accounts = POS.objects.all().select_related('user')
+    return render(request, 'library/manage_pos.html', {'pos_accounts': pos_accounts})
+
+
+@login_required
+def add_pos(request):
     if request.user.user_type != 'admin':
         return redirect('dashboard')
     
     if request.method == 'POST':
-        form = POSUserForm(request.POST)
+        form = POSForm(request.POST, request.FILES)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             
-            User.objects.create_user(
+            if User.objects.filter(username=username).exists():
+                messages.error(request, f'Username "{username}" already exists. Please choose a different username.')
+                return render(request, 'library/add_pos.html', {'form': form})
+            
+            if POS.objects.filter(serial_number=form.cleaned_data['serial_number']).exists():
+                messages.error(request, f'Serial number "{form.cleaned_data["serial_number"]}" already exists. Please choose a different serial number.')
+                return render(request, 'library/add_pos.html', {'form': form})
+            
+            user = User.objects.create_user(
                 username=username,
                 password=password,
                 user_type='pos'
             )
+            
+            pos = form.save(commit=False)
+            pos.user = user
+            pos.save()
+            
             messages.success(request, 'POS account created successfully!')
-            return redirect('admin_dashboard')
+            return redirect('manage_pos')
     else:
-        form = POSUserForm()
+        form = POSForm()
     
-    return render(request, 'library/create_pos_account.html', {'form': form})
+    return render(request, 'library/add_pos.html', {'form': form})
+
+
+@login_required
+def edit_pos(request, pos_id):
+    if request.user.user_type != 'admin':
+        return redirect('dashboard')
+    
+    pos = get_object_or_404(POS, id=pos_id)
+    
+    if request.method == 'POST':
+        form = POSForm(request.POST, request.FILES, instance=pos)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data.get('password')
+            
+            if username != pos.user.username and User.objects.filter(username=username).exists():
+                messages.error(request, f'Username "{username}" already exists. Please choose a different username.')
+                return render(request, 'library/edit_pos.html', {'form': form, 'pos': pos})
+            
+            serial_number = form.cleaned_data['serial_number']
+            if serial_number != pos.serial_number and POS.objects.filter(serial_number=serial_number).exists():
+                messages.error(request, f'Serial number "{serial_number}" already exists. Please choose a different serial number.')
+                return render(request, 'library/edit_pos.html', {'form': form, 'pos': pos})
+            
+            if password:
+                pos.user.set_password(password)
+            
+            pos.user.username = username
+            pos.user.save()
+            
+            form.save()
+            messages.success(request, 'POS account updated successfully!')
+            return redirect('manage_pos')
+    else:
+        form = POSForm(instance=pos, initial={'username': pos.user.username})
+    
+    return render(request, 'library/edit_pos.html', {'form': form, 'pos': pos})
+
+
+@login_required
+def delete_pos(request, pos_id):
+    if request.user.user_type != 'admin':
+        return redirect('dashboard')
+    
+    pos = get_object_or_404(POS, id=pos_id)
+    
+    if request.method == 'POST':
+        pos_name = pos.name
+        user = pos.user
+        pos.delete()
+        user.delete()
+        messages.success(request, f'POS account "{pos_name}" deleted successfully!')
+        return redirect('manage_pos')
+    
+    return render(request, 'library/delete_pos.html', {'pos': pos})
+
+
+@login_required
+def create_pos_account(request):
+    return redirect('add_pos')
 
 
 @login_required

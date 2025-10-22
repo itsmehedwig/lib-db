@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Student, Book, User, Librarian, SystemSettings
+from .models import Student, Book, User, Librarian, POS, SystemSettings
 import csv
 from io import TextIOWrapper
 
@@ -121,20 +121,23 @@ class BookForm(forms.ModelForm):
         }
 
 
-class POSUserForm(forms.ModelForm):
+class POSForm(forms.ModelForm):
+    username = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg'})
+    )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg'
-        })
+        widget=forms.PasswordInput(attrs={'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg'}),
+        required=False
     )
     
     class Meta:
-        model = User
-        fields = ['username', 'password']
+        model = POS
+        fields = ['name', 'serial_number', 'profile_photo']
         widgets = {
-            'username': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg'
-            })
+            'name': forms.TextInput(attrs={'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg'}),
+            'serial_number': forms.TextInput(attrs={'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg'}),
+            'profile_photo': forms.FileInput(attrs={'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg'}),
         }
 
 

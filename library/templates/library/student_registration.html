@@ -24,7 +24,7 @@
         <p class="text-gray-700"><strong>Year & Section:</strong> {{ student.year }} - {{ student.section }}</p>
     </div>
     
-    <form method="post" enctype="multipart/form-data" class="space-y-6">
+    <form method="post" action="{% url 'student_registration' %}" enctype="multipart/form-data" class="space-y-6" data-loading data-loading-message="Creating Your Account..." data-loading-submessage="Setting up your student profile">
         {% csrf_token %}
         
         <div>
