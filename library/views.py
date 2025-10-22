@@ -230,7 +230,7 @@ def admin_dashboard(request):
         status='borrowed',
         transaction__approval_status='approved'
     ).count()
-    total_available = total_book_copies - total_borrowed
+    total_available = Book.objects.aggregate(total=Sum('copies_available'))['total'] or 0
     
     total_books = Book.objects.count()
     pending_registrations = Student.objects.filter(
@@ -1217,7 +1217,7 @@ def librarian_dashboard(request):
         status='borrowed',
         transaction__approval_status='approved'
     ).count()
-    total_available = total_book_copies - total_borrowed
+    total_available = Book.objects.aggregate(total=Sum('copies_available'))['total'] or 0
     
     total_books = Book.objects.count()
     pending_registrations = Student.objects.filter(
